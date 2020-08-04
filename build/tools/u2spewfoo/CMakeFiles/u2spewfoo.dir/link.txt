@@ -1,0 +1,1 @@
+/usr/bin/c++     -fvisibility=hidden   -DNDEBUG -g -ggdb          CMakeFiles/u2spewfoo.dir/u2spewfoo.cc.o  -o u2spewfoo 

@@ -69,9 +69,18 @@ public:
         bool literal;
         unsigned flags;
 
+	//// NEWBROAD_BEGIN ////
+        unsigned pid;
+	unsigned threshold;
+
+        //PatternDescriptor(
+          //  bool noc = false, bool neg = false, bool lit = false, unsigned f = 0)
+        //{ no_case = noc; negated = neg; literal = lit; flags = f; }
         PatternDescriptor(
-            bool noc = false, bool neg = false, bool lit = false, unsigned f = 0)
-        { no_case = noc; negated = neg; literal = lit; flags = f; }
+            bool noc = false, bool neg = false, bool lit = false, unsigned f = 0, unsigned p = 0, unsigned t=1)
+        { no_case = noc; negated = neg; literal = lit; flags = f; pid = p; threshold=t;}
+        //// NEWBROAD_EDN ////
+
     };
 
     virtual int add_pattern(

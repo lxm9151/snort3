@@ -1,0 +1,43 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/preprocessor_states.dir/pps_appid.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_arpspoof.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_bo.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_dcerpc.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_dcerpc_server.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_dnp3.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_firewall.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_frag3_engine.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_frag3_global.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_ftp_telnet.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_ftp_telnet_protocol.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_gtp.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_http_inspect.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_http_inspect_server.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_nap_selector.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_normalizers.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_perfmonitor.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_reputation.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_rpc_decode.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_sdf.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_sip.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_ssh.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_ssl.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_dns.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_pop.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_imap.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_modbus.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_rna.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_smtp.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_sfportscan.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_stream5_ip.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_stream5_global.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_stream5_tcp.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_stream5_udp.cc.o"
+  "CMakeFiles/preprocessor_states.dir/pps_stream5_ha.cc.o"
+  "CMakeFiles/preprocessor_states.dir/preprocessor_api.cc.o"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/preprocessor_states.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

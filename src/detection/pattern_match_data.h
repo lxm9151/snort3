@@ -66,6 +66,12 @@ struct PatternMatchData
     uint16_t flags;          // from above enum
     uint16_t mpse_flags;     // passed through to mpse
 
+     //// NEWBROD_BEGIN ////
+    unsigned pid;
+    unsigned threshold;
+    //// NEWBROAD_END ////
+
+
     uint16_t fp_offset;
     uint16_t fp_length;
 

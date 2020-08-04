@@ -450,9 +450,13 @@ static int fpFinishPortGroupRule(
     PMX* pmx = (PMX*)snort_calloc(sizeof(PMX));
     pmx->rule_node.rnRuleData = otn;
     pmx->pmd = pmd;
-
+    //// NEWBROAD_BEGIN ////
+    //Mpse::PatternDescriptor desc(
+      //  pmd->is_no_case(), pmd->is_negated(), pmd->is_literal(), pmd->mpse_flags);
     Mpse::PatternDescriptor desc(
-        pmd->is_no_case(), pmd->is_negated(), pmd->is_literal(), pmd->mpse_flags);
+        pmd->is_no_case(), pmd->is_negated(), pmd->is_literal(), pmd->mpse_flags, pmd->pid,pmd->threshold);
+    //// NEWBROAD_BEGIN ////
+
 
     mpse->add_pattern((const uint8_t*)pattern, pattern_length, desc, pmx);
 

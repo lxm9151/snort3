@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC    -fvisibility=hidden   -DNDEBUG -g -ggdb         -shared  -o daq_file.so CMakeFiles/daq_file.dir/daq_file.c.o 

@@ -77,6 +77,12 @@ struct SdPatternConfig
 
     std::string pii;
     unsigned threshold = 1;
+//// NEWBROAD_BEGIN ////
+    unsigned pid=0 ;
+    uint16_t mpse_flags=0;
+    //// NEWBROAD_END ////
+
+
     bool obfuscate_pii = false;
     bool forced_boundary = false;
     int (* validate)(const uint8_t* buf, unsigned long long buflen) = nullptr;
@@ -99,6 +105,12 @@ struct SdPatternConfig
         obfuscate_pii = false;
         validate = nullptr;
         db = nullptr;
+
+	 //// NEWBROAD_BEGIN ////
+        pid=0;
+        mpse_flags=0;
+    //// NEWBROAD_END ////
+
     }
 };
 
@@ -137,6 +149,13 @@ SdPatternOption::SdPatternOption(const SdPatternConfig& c) :
     config.pmd.pattern_size = config.pii.size();
     config.pmd.fp_length = config.pmd.pattern_size;
     config.pmd.fp_offset = 0;
+
+     //// NEWBROAD_BEGIN ////
+    config.pmd.pid = config.pid;
+    config.pmd.threshold = config.threshold;
+    config.pmd.mpse_flags=config.mpse_flags;
+    //// NEWBROAD_END ////
+
 }
 
 SdPatternOption::~SdPatternOption()
@@ -261,6 +280,13 @@ IpsOption::EvalStatus SdPatternOption::eval(Cursor& c, Packet* p)
 {
     RuleProfile profile(sd_pattern_perf_stats);
 
+    ///// NEWBROAD_BEGIN /////
+        if(config.pmd.mpse_flags & HS_FLAG_COMBINATION){
+                return MATCH;
+        }
+///// NEWBROAD_END /////
+
+
     unsigned matches = SdSearch(c, p);
 
     if ( matches >= config.threshold )
@@ -286,6 +312,18 @@ static const Parameter s_params[] =
 
     { "threshold", Parameter::PT_INT, "1:max32", "1",
       "number of matches before alerting" },
+
+    ///// NEWBROAD_BEGIN /////
+    { "pid", Parameter::PT_INT, "1:max32", "1",
+      "number of sd_pattern id" },
+
+     { "combination", Parameter::PT_IMPLIED, nullptr, nullptr,
+      "combination" },
+
+     { "quiet", Parameter::PT_IMPLIED, nullptr, nullptr,
+      "quiet" },
+///// NEWBROAD_EDN /////
+
 
     { nullptr, Parameter::PT_MAX, nullptr, nullptr, nullptr }
 };
@@ -339,6 +377,17 @@ bool SdPatternModule::set(const char*, Value& v, SnortConfig*)
     }
     else if ( v.is("threshold") )
         config.threshold = v.get_uint32();
+    ///// NEWBROAD_BEGIN /////
+    else if ( v.is("pid") )
+        config.pid = v.get_uint32();
+    else if ( v.is("combination") ){
+
+        config.mpse_flags = HS_FLAG_COMBINATION;
+    }
+    else if ( v.is("quiet") )
+        config.mpse_flags = HS_FLAG_QUIET;
+///// NEWBROAD_EDN /////
+
     else
         return false;
 

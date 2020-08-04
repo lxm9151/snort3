@@ -1,0 +1,36 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../src/framework/base_api.h
+cstdint
+-
+framework/api_options.h
+../src/framework/framework/api_options.h
+
+../src/managers/plugin_manager.h
+map
+-
+memory
+-
+string
+-
+framework/base_api.h
+../src/managers/framework/base_api.h
+
+/home/vagrant/snort3/src/network_inspectors/network_inspectors.cc
+network_inspectors.h
+/home/vagrant/snort3/src/network_inspectors/network_inspectors.h
+config.h
+/home/vagrant/snort3/src/network_inspectors/config.h
+managers/plugin_manager.h
+/home/vagrant/snort3/src/network_inspectors/managers/plugin_manager.h
+
+/home/vagrant/snort3/src/network_inspectors/network_inspectors.h
+
+config.h
+
