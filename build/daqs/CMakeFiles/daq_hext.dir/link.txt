@@ -1,1 +1,0 @@
-/usr/bin/cc -fPIC    -fvisibility=hidden   -DNDEBUG -g -ggdb         -shared  -o daq_hext.so CMakeFiles/daq_hext.dir/daq_hext.c.o 
