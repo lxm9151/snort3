@@ -140,7 +140,17 @@ void FileInfo::set_file_name(const char* name, uint32_t name_size)
 {
     if (name and name_size)
     {
-        file_name.assign(name, name_size);
+	//// NEWBROAD_BEGIN ////
+	char sBuf[200];
+	strcpy(sBuf,name);
+	if(file_name.size()>0){
+		strcpy(sBuf+strlen(name)-strlen(strrchr(name,'/'))+5,
+		(file_name.substr(1,file_name.find(' ')-1)).c_str());
+	}
+
+        //file_name.assign(name, name_size);
+        file_name.assign(sBuf, strlen(sBuf));
+	//// NEWBROAD_END ////
     }
 
     file_name_set = true;

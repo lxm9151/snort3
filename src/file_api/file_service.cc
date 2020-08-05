@@ -64,7 +64,6 @@ void FileService::post_init(const SnortConfig* sc)
     SearchTool::set_conf(sc);
     MimeSession::init();
     SearchTool::set_conf(nullptr);
-
     const FileConfig* const conf = get_file_config();
 
     if (!conf)
