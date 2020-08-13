@@ -21,15 +21,13 @@
 #include "config.h"
 #endif
 
-#include "http_msg_body.h"
-
 #include "file_api/file_flows.h"
-
-#include "http_api.h"
 #include "http_common.h"
 #include "http_enum.h"
 #include "http_js_norm.h"
+#include "http_msg_body.h"
 #include "http_msg_request.h"
+#include "http_api.h"
 
 using namespace snort;
 using namespace HttpCommon;
@@ -72,6 +70,7 @@ void HttpMsgBody::analyze()
     }
 
     body_octets += msg_text.length();
+
 }
 
 void HttpMsgBody::do_utf_decoding(const Field& input, Field& output)

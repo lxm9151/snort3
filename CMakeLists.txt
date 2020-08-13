@@ -54,6 +54,12 @@ if (ENABLE_UNIT_TESTS)
     add_custom_target (check COMMAND ${CMAKE_CTEST_COMMAND})
 endif (ENABLE_UNIT_TESTS)
 
+# Add Modsecurity 
+include_directories ("/usr/local/modsecurity/include")
+link_directories("/usr/local/modsecurity/lib")
+link_libraries("modsecurity")
+link_libraries("hiredis")
+
 add_subdirectory (src)
 add_subdirectory (tools)
 add_subdirectory (lua)

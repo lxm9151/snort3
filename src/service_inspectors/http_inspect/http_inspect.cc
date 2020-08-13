@@ -50,6 +50,15 @@
 #include "http_msg_trailer.h"
 #include "http_test_manager.h"
 
+///// NEWBROAD_BEGIN /////
+#include "packet_io/active.h"
+
+#include <modsecurity/modsecurity.h>
+#include <modsecurity/transaction.h>
+
+#include <modsecurity/wac.h>
+//// NEWBROAD_END ////
+
 using namespace snort;
 using namespace HttpCommon;
 using namespace HttpEnums;
@@ -446,7 +455,10 @@ void HttpInspect::eval(Packet* p)
     }
 
     const bool buf_owner = !session_data->partial_flush[source_id];
-    if (!process(p->data, p->dsize, p->flow, source_id, buf_owner))
+    //// NEWBROAD_BEGIN ////
+    //if (!process(p->data, p->dsize, p->flow, source_id, buf_owner))
+    if (!process(p->data, p->dsize, p->flow, source_id, buf_owner, p))
+    //// NEWBROAD_END ////
         disable_detection(p);
 
 #ifdef REG_TEST
@@ -478,11 +490,33 @@ void HttpInspect::eval(Packet* p)
     SetExtraData(p, xtra_jsnorm_id);
 }
 
+///// NEWBROAD_END ////
+extern  Rules *mscRules ;
+extern  ModSecurity *msc;
+
+inline static char *trim(char *str)
+{
+        char *p = str;
+        char *p1;
+        if(p)
+        {
+            p1 = p + strlen(str) - 1;
+            while(*p && isspace(*p))
+                p++;
+            while(p1 > p && isspace(*p1))
+                *p1--=0;
+        }
+        return p;
+}
+///// NEWBROAD_END ////
+
 bool HttpInspect::process(const uint8_t* data, const uint16_t dsize, Flow* const flow,
-    SourceId source_id, bool buf_owner) const
+    SourceId source_id, bool buf_owner, const snort::Packet* p) const
 {
     HttpMsgSection* current_section;
     HttpFlowData* session_data = http_get_flow_data(flow);
+
+
 
     if (!session_data->partial_flush[source_id])
         HttpModule::increment_peg_counts(PEG_INSPECT);
@@ -533,6 +567,127 @@ bool HttpInspect::process(const uint8_t* data, const uint16_t dsize, Flow* const
     }
 
     current_section->analyze();
+    //// NEWBORAD_BEGIN /////
+
+    HttpTransaction* tran = current_section->get_transaction();
+
+    switch (session_data->section_type[source_id])
+    {
+    case SEC_REQUEST:
+	    {
+	   char uriBuf[1024];
+	   char mthBuf[41];
+	char src_addr[41], dst_addr[41];
+	flow->client_ip.ntop(src_addr, sizeof(src_addr));
+	flow->server_ip.ntop(dst_addr, sizeof(dst_addr));
+	msc_process_connection(tran->mscTran, src_addr,flow->client_port,dst_addr,flow->server_port);
+	   HttpMsgRequest* request=(HttpMsgRequest*)current_section ;
+	memset(uriBuf,0,sizeof(uriBuf));
+	   strncpy(uriBuf,(char*)request->get_uri_norm_classic().start(),request->get_uri_norm_classic().length());
+	memset(mthBuf,0,sizeof(mthBuf));
+	   strncpy(mthBuf,(char*)request->get_method().start(),request->get_method().length());
+    	msc_process_uri(tran->mscTran, uriBuf,mthBuf, "1.1");
+	    }
+        break;
+    case SEC_STATUS:
+        break;
+    case SEC_HEADER:
+	{
+	   char strBuf[2048];
+	   bool noBody=true;
+	   HttpMsgHeader* head=tran->get_header(source_id);
+	memset(strBuf,0,sizeof(strBuf));
+	strncpy(strBuf,(char*)head->get_classic_raw_header().start(),head->get_classic_raw_header().length());
+        char *start=strBuf;
+        char *line=strBuf;
+
+        while(*line!='\r' && *line!='\0'){
+            char *key;
+            char * value;
+            //while(*start!=':'){
+		//if (*start >= 'A' && *start <= 'Z'){
+			//*start=(*start)+ 32;
+		//}
+		//start++;
+	    //}
+            while(*(start++)!=':');
+            *(start-1)='\0';
+	    start++;
+            key=line;
+            value=start;
+            while(start++,*start!='\0' && *start!='\r');
+            *start++='\0';
+            start++;
+            line=start;
+
+	    //if(strcmp(trim(key),"content-lengt")==0 && atoi(value)>0){
+	    if(strcmp(trim(key),"Content-Length")==0 && atoi(value)>0){
+		    noBody=false;
+	    }
+            msc_add_request_header(tran->mscTran,(const unsigned char*)trim(key),(const unsigned char*)trim(value));
+        }
+
+        msc_process_request_headers(tran->mscTran);
+	if(source_id==SRC_CLIENT && noBody){
+		int con;
+		con=msc_parse_request_body(tran->mscTran);
+		if(!con){
+			msc_eval_request_body(tran->mscTran);
+		}
+		msc_process_logging(tran->mscTran);
+	}
+	}
+        break;
+    case SEC_BODY_CL:
+	{
+	HttpMsgBody* body=(HttpMsgBody*)current_section;
+	msc_append_request_body(tran->mscTran,(const unsigned char*)body->get_classic_client_body().start(),body->get_classic_client_body().length());
+	if(source_id==SRC_CLIENT && session_data->cutter[source_id] == nullptr){
+		int con;
+		con=msc_parse_request_body(tran->mscTran);
+		if(!con){
+            if(params->wacEnable!=WAC_OFF){
+                WAC* pWAC;
+                pWAC=wac_create(tran->mscTran);
+                if(params->wacEnable!=WAC_STUDYONLY){
+                    wac_detect(pWAC);
+                }
+                msc_eval_request_body(tran->mscTran);
+
+                ModSecurityIntervention intervention;
+                intervention.status = 200;
+                intervention.url = NULL;
+                intervention.log = NULL;
+                intervention.disruptive = 0;
+
+                if(params->wacEnable!=WAC_DETECTONLY && msc_intervention(tran->mscTran, &intervention)==0){
+                    wac_study(pWAC);
+                }
+                else{
+		    if(p){
+		    	p->active->drop_packet(p);
+		    }
+                }
+                wac_free(pWAC);
+            }
+            else{
+                msc_eval_request_body(tran->mscTran);
+            }
+        }
+		msc_process_logging(tran->mscTran);
+	}
+	}
+        break;
+    case SEC_BODY_OLD:
+    case SEC_BODY_CHUNK:
+    case SEC_BODY_H2:
+    case SEC_TRAILER:
+    default:
+        break;
+    }
+//// NEWBROAD_END ////
+
+
     current_section->gen_events();
     if (!session_data->partial_flush[source_id])
         current_section->update_flow();
@@ -606,8 +761,8 @@ void HttpInspect::clear(Packet* p)
         session_data->detection_status[source_id] = DET_OFF;
     }
 
-    current_transaction->garbage_collect();
-    session_data->garbage_collect();
+   current_transaction->garbage_collect();
+   session_data->garbage_collect();
 
     if (session_data->cutover_on_clear)
     {

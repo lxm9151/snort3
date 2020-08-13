@@ -28,10 +28,9 @@
 #include "http_cursor_data.h"
 #include "http_enum.h"
 #include "http_field.h"
-#include "http_flow_data.h"
 #include "http_module.h"
+#include "http_flow_data.h"
 #include "http_transaction.h"
-
 //-------------------------------------------------------------------------
 // HttpMsgSection class
 //-------------------------------------------------------------------------

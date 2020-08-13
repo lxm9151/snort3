@@ -25,6 +25,18 @@
 #include "http_event.h"
 #include "http_flow_data.h"
 
+
+///// NEWBROAD_BEGIN /////
+
+#include <modsecurity/modsecurity.h>
+#include <modsecurity/transaction.h>
+
+#include <modsecurity/wac.h>
+extern  Rules *mscRules ;
+extern  ModSecurity *msc;
+
+//// NEWBROAD_END ////
+
 class HttpMsgRequest;
 class HttpMsgStatus;
 class HttpMsgHeader;
@@ -68,6 +80,10 @@ public:
 
     HttpTransaction* next = nullptr;
 
+    //// NEWBROAD_BEGIN ////
+    Transaction* mscTran=nullptr;
+    //// NEWBROAD_EDN ////
+
     // Each file processed has a unique id per flow: hash(source_id, transaction_id, h2_stream_id)
     // If this is an HTTP/1 flow, h2_stream_id is 0
     void set_file_processing_id(const HttpCommon::SourceId source_id,
@@ -80,6 +96,9 @@ private:
     {
         infractions[0] = nullptr;
         infractions[1] = nullptr;
+//// NEWBROAD_BEGIN /////
+	mscTran=msc_new_transaction(msc, mscRules, NULL);; 
+//// NEWBROAD_END /////
     }
     void discard_section(HttpMsgSection* section);
 

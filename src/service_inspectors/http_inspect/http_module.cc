@@ -29,6 +29,29 @@
 #include "http_js_norm.h"
 #include "http_uri_norm.h"
 
+///// NEWBROAD_BEGIN /////
+
+#include <modsecurity/modsecurity.h>
+#include <modsecurity/transaction.h>
+
+#include <modsecurity/wac.h>
+
+Rules *mscRules = NULL;
+ModSecurity *msc;
+
+static void
+logCb(void *log, const void* data)
+{
+    const char *msg;
+//    if (log == NULL) {
+  //      return;
+   // }
+    msg = (const char *) data;
+    fprintf(stderr,"%s\n",msg);
+}
+
+//// NEWBROAD_END ////
+
 using namespace snort;
 using namespace HttpEnums;
 
@@ -123,6 +146,21 @@ const Parameter HttpModule::http_params[] =
     { "show_scan", Parameter::PT_BOOL, nullptr, "false",
       "display scanned segments" },
 #endif
+    //// NEWBROAD_BEGIN ////
+
+    { "modsecurity", Parameter::PT_STRING, "(optional)", nullptr,
+      "" },
+
+    { "modsecurity_rules_file", Parameter::PT_STRING, "(optional)", nullptr,
+      "" },
+
+    { "wac", Parameter::PT_STRING, "(optional)", nullptr,
+      "" },
+
+    { "wac_mem_addr", Parameter::PT_STRING, "(optional)", nullptr,
+      "" },
+
+    //// NEWBROAD_END ////
 
     { nullptr, Parameter::PT_MAX, nullptr, nullptr, nullptr }
 };
@@ -269,6 +307,47 @@ bool HttpModule::set(const char*, Value& val, SnortConfig*)
         params->show_scan = val.get_bool();
     }
 #endif
+//// NEWBROAD_BEGIN ////
+    else if (val.is("modsecurity"))
+    {
+		const char * p;
+		p=val.get_string();
+		if(strcasecmp(p,"on")==0){
+        	params->mscEnable=1;
+    	}
+    	else{
+        	params->mscEnable=0;
+    	}
+    }
+    else if (val.is("modsecurity_rules_file"))
+    {
+		params->mscRulesFile=val.get_string();
+	}
+    else if (val.is("wac"))
+    {
+		const char * p;
+		p=val.get_string();
+		if(strcasecmp(p,"on")==0){
+        	params->wacEnable=WAC_ON;
+    	}
+    	else if(strcasecmp(p,"studyOnly")==0){
+        	params->wacEnable=WAC_STUDYONLY;
+    	}
+    	else if(strcasecmp(p,"detectOnly")==0){
+        	params->wacEnable=WAC_DETECTONLY;
+    	}	
+    	else{
+        	params->wacEnable=WAC_OFF;
+		}
+    }	
+    else if (val.is("wac_mem_addr"))
+    {
+		std::string buf=val.get_string();
+		params->wacMemHost=buf.substr(0,buf.find(':'));
+		params->wacMemPort=std::stoi(buf.substr(buf.find(':')+1));
+	}
+//// NEWBROAD_EDN ////
+
     else
     {
         return false;
@@ -298,6 +377,30 @@ bool HttpModule::end(const char*, int, SnortConfig*)
         params->js_norm_param.js_norm =
             new HttpJsNorm(params->js_norm_param.max_javascript_whitespaces, params->uri_param);
     }
+    //// NEWBROAD_BEGIN /////
+     if(params->mscEnable){
+        const char *error = NULL;
+        int ret;
+        msc=msc_init();
+
+        msc_set_connector_info(msc, "ModSecurity-test v0.0.1-alpha (Simple " \
+              "example on how to use ModSecurity API");
+        msc_set_log_cb(msc,logCb);
+
+        mscRules = msc_create_rules_set();
+
+        ret = msc_rules_add_file(mscRules, params->mscRulesFile.c_str(), &error);
+        if (ret < 0) {
+            fprintf(stderr, "Problems loading the rules --\n");
+            fprintf(stderr, "%s\n", error);
+        }
+        if(params->wacEnable!=WAC_OFF){
+            redisConn = redisConnect(params->wacMemHost.c_str(),params->wacMemPort);
+        }
+    }
+
+//// NEWBROAD_END /////
+
     return true;
 }
 

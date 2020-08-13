@@ -608,6 +608,7 @@ void Analyzer::init_unprivileged()
     const unsigned max_contexts = 255;
 #endif
 
+    
     switcher = new ContextSwitcher;
 
     for ( unsigned i = 0; i < max_contexts; ++i )

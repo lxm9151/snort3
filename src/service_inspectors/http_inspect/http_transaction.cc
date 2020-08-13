@@ -34,6 +34,16 @@
 
 #include "hash/hash_key_operations.h"
 
+///// NEWBROAD_BEGIN /////
+
+#include <modsecurity/modsecurity.h>
+#include <modsecurity/transaction.h>
+
+#include <modsecurity/wac.h>
+//// NEWBROAD_END ////
+
+
+
 using namespace HttpCommon;
 using namespace HttpEnums;
 using namespace snort;
@@ -60,6 +70,9 @@ HttpTransaction::~HttpTransaction()
     }
     delete_section_list(body_list);
     delete_section_list(discard_list);
+    //// NEWBROAD_BEGIN ////
+    msc_transaction_cleanup(mscTran);;
+    //// NEWBROAD_END ////
 }
 
 HttpTransaction* HttpTransaction::attach_my_transaction(HttpFlowData* session_data, SourceId

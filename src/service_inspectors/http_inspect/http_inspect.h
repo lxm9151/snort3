@@ -41,7 +41,7 @@ class HttpInspect : public snort::Inspector
 {
 public:
     HttpInspect(const HttpParaList* params_);
-    ~HttpInspect() override { delete params; }
+    ~HttpInspect() override {;delete params;}
 
     bool get_buf(snort::InspectionBuffer::Type ibt, snort::Packet* p,
         snort::InspectionBuffer& b) override;
@@ -74,9 +74,12 @@ public:
 private:
     friend HttpApi;
     friend HttpStreamSplitter;
-
+    //// NEWBROAD_BEGIN ////
+    //bool process(const uint8_t* data, const uint16_t dsize, snort::Flow* const flow,
+      //  HttpCommon::SourceId source_id_, bool buf_owner) const;
     bool process(const uint8_t* data, const uint16_t dsize, snort::Flow* const flow,
-        HttpCommon::SourceId source_id_, bool buf_owner) const;
+        HttpCommon::SourceId source_id_, bool buf_owner, const snort::Packet* p=NULL) const;
+    //// NEWBROAD_EDN ////
     static HttpFlowData* http_get_flow_data(const snort::Flow* flow);
     static void http_set_flow_data(snort::Flow* flow, HttpFlowData* flow_data);
 

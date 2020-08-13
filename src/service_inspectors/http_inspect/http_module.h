@@ -28,8 +28,20 @@
 
 #include "http_enum.h"
 
+
+///// NEWBROAD_BEGIN /////
+
+#include <modsecurity/modsecurity.h>
+#include <modsecurity/transaction.h>
+
+#include <modsecurity/wac.h>
+extern Rules *mscRules;
+extern ModSecurity *msc;
+//// NEWBROAD_END ////
+
 #define HTTP_NAME "http_inspect"
 #define HTTP_HELP "HTTP inspector"
+
 
 struct HttpParaList
 {
@@ -89,13 +101,33 @@ public:
     bool show_pegs = true;
     bool show_scan = false;
 #endif
+
+    //// NEWBROAD_BEGIN ////
+
+    uint8_t mscEnable=0;
+    std::string mscRulesFile;
+    uint8_t wacEnable=WAC_OFF;
+    std::string wacMemHost;
+    uint16_t wacMemPort;
+
+
+    //// NEWBROAD_END ////
 };
 
 class HttpModule : public snort::Module
 {
 public:
     HttpModule() : Module(HTTP_NAME, HTTP_HELP, http_params) { }
-    ~HttpModule() override { delete params; }
+    ~HttpModule() override { 
+//// NEWBROAD_BEGIN /////
+    if(redisConn!=NULL){
+        redisFree(redisConn);
+    }
+
+    msc_rules_cleanup(mscRules);
+    msc_cleanup(msc);
+//// NEWBROAD_END /////
+	    delete params; }
     bool begin(const char*, int, snort::SnortConfig*) override;
     bool end(const char*, int, snort::SnortConfig*) override;
     bool set(const char*, snort::Value&, snort::SnortConfig*) override;

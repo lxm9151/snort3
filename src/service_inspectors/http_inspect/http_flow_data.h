@@ -39,6 +39,7 @@ class HttpMsgSection;
 class HttpCutter;
 class HttpQueryParser;
 
+
 class HttpFlowData : public snort::FlowData
 {
 public:

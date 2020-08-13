@@ -32,10 +32,8 @@ void HttpMsgBodyCl::update_flow()
         update_depth();
     }
     else
-    {
         // End of message
         session_data->half_reset(source_id);
-    }
 }
 
 #ifdef REG_TEST
