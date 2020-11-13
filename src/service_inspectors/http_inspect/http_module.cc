@@ -398,7 +398,6 @@ bool HttpModule::end(const char*, int, SnortConfig*)
             redisConn = redisConnect(params->wacMemHost.c_str(),params->wacMemPort);
         }
     }
-
 //// NEWBROAD_END /////
 
     return true;

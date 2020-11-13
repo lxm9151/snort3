@@ -71,7 +71,9 @@ HttpTransaction::~HttpTransaction()
     delete_section_list(body_list);
     delete_section_list(discard_list);
     //// NEWBROAD_BEGIN ////
-    msc_transaction_cleanup(mscTran);;
+    if(mscTran!=nullptr){
+    	msc_transaction_cleanup(mscTran);;
+    }
     //// NEWBROAD_END ////
 }
 

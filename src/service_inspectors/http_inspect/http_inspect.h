@@ -41,7 +41,7 @@ class HttpInspect : public snort::Inspector
 {
 public:
     HttpInspect(const HttpParaList* params_);
-    ~HttpInspect() override {;delete params;}
+    ~HttpInspect() override {delete params;}
 
     bool get_buf(snort::InspectionBuffer::Type ibt, snort::Packet* p,
         snort::InspectionBuffer& b) override;

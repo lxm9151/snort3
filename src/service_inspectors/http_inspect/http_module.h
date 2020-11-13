@@ -124,8 +124,10 @@ public:
         redisFree(redisConn);
     }
 
+if(msc!=nullptr){
     msc_rules_cleanup(mscRules);
     msc_cleanup(msc);
+}
 //// NEWBROAD_END /////
 	    delete params; }
     bool begin(const char*, int, snort::SnortConfig*) override;

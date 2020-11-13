@@ -97,7 +97,9 @@ private:
         infractions[0] = nullptr;
         infractions[1] = nullptr;
 //// NEWBROAD_BEGIN /////
+if(msc!=nullptr){
 	mscTran=msc_new_transaction(msc, mscRules, NULL);; 
+}
 //// NEWBROAD_END /////
     }
     void discard_section(HttpMsgSection* section);

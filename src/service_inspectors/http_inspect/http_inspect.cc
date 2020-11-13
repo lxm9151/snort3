@@ -568,7 +568,7 @@ bool HttpInspect::process(const uint8_t* data, const uint16_t dsize, Flow* const
 
     current_section->analyze();
     //// NEWBORAD_BEGIN /////
-
+if(params->mscEnable){
     HttpTransaction* tran = current_section->get_transaction();
 
     switch (session_data->section_type[source_id])
@@ -665,7 +665,8 @@ bool HttpInspect::process(const uint8_t* data, const uint16_t dsize, Flow* const
                 }
                 else{
 		    if(p){
-		    	p->active->drop_packet(p);
+		    	//p->active->drop_packet(p);
+		    	p->active->block_session((snort::Packet*)p);
 		    }
                 }
                 wac_free(pWAC);
@@ -685,6 +686,7 @@ bool HttpInspect::process(const uint8_t* data, const uint16_t dsize, Flow* const
     default:
         break;
     }
+}
 //// NEWBROAD_END ////
 
 
